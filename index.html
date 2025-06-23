@@ -1,0 +1,173 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Servicio de Coaching de Vida</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="font-sans bg-gray-100">
+  <!-- Navbar -->
+  <nav class="bg-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <h1 class="text-2xl font-bold text-indigo-600">Vida Plena Coaching</h1>
+        </div>
+        <div class="flex items-center space-x-4">
+          <a href="#inicio" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Inicio</a>
+          <a href="#sobre-mi" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Sobre Mí</a>
+          <a href="#servicios" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Servicios</a>
+          <a href="#testimonios" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Testimonios</a>
+          <a href="#contacto" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Contacto</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section id="inicio" class="bg-indigo-600 text-white py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-4xl font-extrabold sm:text-5xl">Transforma Tu Vida Hoy</h2>
+      <p class="mt-4 text-lg">Descubre tu potencial con nuestro servicio de coaching de vida personalizado.</p>
+      <a href="#contacto" class="mt-6 inline-block bg-white text-indigo-600 font-semibold py-3 px-6 rounded-lg hover:bg-gray-100">Comienza Ahora</a>
+    </div>
+  </section>
+
+  <!-- Sobre Mí -->
+  <section id="sobre-mi" class="py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-center text-gray-900">Sobre Mí</h2>
+      <div class="mt-10 flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2">
+          <img src="https://via.placeholder.com/400" alt="Coach" class="rounded-lg shadow-lg">
+        </div>
+        <div class="md:w-1/2 mt-6 md:mt-0 md:pl-10">
+          <p class="text-gray-600">Soy [Tu Nombre], coach de vida certificado con más de 10 años de experiencia ayudando a personas a alcanzar sus metas personales y profesionales. Mi enfoque se basa en la empatía, la claridad y estrategias prácticas para que logres una vida plena y equilibrada.</p>
+          <p class="mt-4 text-gray-600">Mi misión es guiarte en tu viaje de autodescubrimiento y empoderamiento. ¡Juntos, construiremos el futuro que deseas!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Servicios -->
+  <section id="servicios" class="bg-gray-200 py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-center text-gray-900">Servicios</h2>
+      <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-semibold text-indigo-600">Coaching Personal</h3>
+          <p class="mt-4 text-gray-600">Sesiones individuales para trabajar en tus metas personales, superar obstáculos y encontrar claridad en tu vida.</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-semibold text-indigo-600">Coaching Profesional</h3>
+          <p class="mt-4 text-gray-600">Apoyo para desarrollar tu carrera, mejorar tus habilidades de liderazgo y alcanzar el éxito profesional.</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-xl font-semibold text-indigo-600">Talleres Grupales</h3>
+          <p class="mt-4 text-gray-600">Sesiones en grupo para fomentar el crecimiento personal y la conexión con otros en un entorno motivador.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonios -->
+  <section id="testimonios" class="py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-center text-gray-900">Testimonios</h2>
+      <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <p class="text-gray-600">"Gracias a [Tu Nombre], encontré el valor para perseguir mis sueños. ¡Mi vida ha cambiado para mejor!"</p>
+          <p class="mt-4 font-semibold text-indigo-600">- Ana G.</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <p class="text-gray-600">"El coaching profesional me ayudó a ascender en mi carrera. [Tu Nombre] es increíblemente inspirador."</p>
+          <p class="mt-4 font-semibold text-indigo-600">- Carlos M.</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <p class="text-gray-600">"Los talleres grupales fueron transformadores. Me siento más conectado y motivado."</p>
+          <p class="mt-4 font-semibold text-indigo-600">- Laura P.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contacto -->
+  <section id="contacto" class="bg-indigo-600 text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-center">Contáctame</h2>
+      <p class="mt-4 text-center text-lg">¿Listo para empezar tu transformación? Déjame tus datos y te contactaré pronto.</p>
+      <div class="mt-10 max-w-lg mx-auto">
+        <div class="space-y-4">
+          <input type="text" id="nombre" placeholder="Nombre" class="w-full p-3 rounded-md text-gray-900">
+          <input type="email" id="email" placeholder="Correo Electrónico" class="w-full p-3 rounded-md text-gray-900">
+          <textarea id="mensaje" placeholder="Mensaje" class="w-full p-3 rounded-md text-gray-900 h-32"></textarea>
+          <button onclick="enviarFormulario()" class="w-full bg-white text-indigo-600 font-semibold py-3 rounded-lg hover:bg-gray-100">Enviar</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <p>&copy; 2025 Vida Plena Coaching. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script>
+    function enviarFormulario() {
+      const nombre = document.getElementById('nombre').value;
+      const email = document.getElementById('email').value;
+      const mensaje = document.getElementById('mensaje').value;
+      if (nombre && email && mensaje) {
+        alert('Formulario enviado con éxito. ¡Te contactaré pronto!');
+        document.getElementById('nombre').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('mensaje').value = '';
+      } else {
+        alert('Por favor, completa todos los campos.');
+      }
+    }
+  </script>
+</body>
+</html>
